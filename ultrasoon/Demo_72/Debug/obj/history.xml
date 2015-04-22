@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<history>
+   <processor signature="arm-none-eabi-gcc 4.8.1 mingw32 -mcpu=cortex-m4 -mthumb -Wall -ffunction-sections -g -O0 -c -DSTM32F407VG -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -D__ASSEMBLY__ -I..\..\..\..\..\Users\Rick\Desktop\Demo_72_HCSR04\cmsis_lib -I..\..\..\..\..\Users\Rick\Desktop\Demo_72_HCSR04\ub_lib -I..\..\..\..\..\Users\Rick\Desktop\Demo_72_HCSR04\cmsis_boot -I..\..\..\..\..\Users\Rick\Desktop\Demo_72_HCSR04 -I..\..\..\..\..\Users\Rick\Desktop\Demo_72_HCSR04\semihosting -I..\..\..\..\..\Users\Rick\Desktop\Demo_72_HCSR04\cmsis -I..\..\..\..\..\Users\Rick\Desktop -I..\..\..\..\..\Users\Rick\Desktop\Demo_72_HCSR04\cmsis_lib\include">
+      <target file="stm32f4xx_gpio.o" lastModified="14c55bb5383">
+         <source file="..\..\..\cmsis_lib\source\stm32f4xx_gpio.c" lastModified="1431af43a90"/>
+      </target>
+      <target file="stm32f4xx_tim.o" lastModified="14c55bb5746">
+         <source file="..\..\..\cmsis_lib\source\stm32f4xx_tim.c" lastModified="1431af92460"/>
+      </target>
+      <target file="printf.o" lastModified="14c55bb52a5">
+         <source file="..\..\..\stdio\printf.c" lastModified="14c45e81b82"/>
+      </target>
+      <target file="system_stm32f4xx.o" lastModified="14c55bb5455">
+         <source file="..\..\..\cmsis_boot\system_stm32f4xx.c" lastModified="1431af43a90"/>
+      </target>
+      <target file="startup_stm32f4xx.o" lastModified="14c55bb4ee4">
+         <source file="..\..\..\cmsis_boot\startup\startup_stm32f4xx.c" lastModified="1431af43a90"/>
+      </target>
+      <target file="stm32_ub_led.o" lastModified="14c55bb4f9f">
+         <source file="..\..\..\ub_lib\stm32_ub_led.c" lastModified="14c327fbee8"/>
+      </target>
+      <target file="main.o" lastModified="14c7a46c6fa">
+         <source file="..\..\..\main.c" lastModified="14c7a3e982e"/>
+      </target>
+      <target file="sh_cmd.o" lastModified="14c55bb5396">
+         <source file="..\..\..\semihosting\sh_cmd.s" lastModified="14c31923105"/>
+      </target>
+      <target file="semihosting.o" lastModified="14c55bb4d62">
+         <source file="..\..\..\semihosting\semihosting.c" lastModified="14c31acdf9a"/>
+      </target>
+      <target file="stm32_ub_hcsr04.o" lastModified="14c7a46c622">
+         <source file="..\..\..\ub_lib\stm32_ub_hcsr04.c" lastModified="14c79f568d6"/>
+      </target>
+      <target file="stm32f4xx_rcc.o" lastModified="14c55bb51b4">
+         <source file="..\..\..\cmsis_lib\source\stm32f4xx_rcc.c" lastModified="1431af43a90"/>
+      </target>
+      <target file="misc.o" lastModified="14c55bb551a">
+         <source file="..\..\..\cmsis_lib\source\misc.c" lastModified="1431af91c90"/>
+      </target>
+   </processor>
+</history>
