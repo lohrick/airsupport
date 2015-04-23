@@ -20,9 +20,6 @@
 #include "stm32_ub_hcsr04.h"
 #include <stdio.h>
 
-void P_HCSR04_InitIO(void);
-void P_HCSR04_InitTIM(void);
-void P_HCSR04_InitNVIC(void);
 void P_HCSR04_Trigger(uint32_t pin);
 
 GPIO_InitTypeDef GPIO_InitStructure;
@@ -31,10 +28,6 @@ void UB_HCSR04_Init(void) {
 	HCSR04.t2_akt_time = 0;
 	HCSR04.t7_akt_time = 0;
 	HCSR04.delay_us = 0;
-
-	P_HCSR04_InitIO();
-	P_HCSR04_InitTIM();
-	P_HCSR04_InitNVIC();
 }
 
 //--------------------------------------------------------------
@@ -108,7 +101,7 @@ void P_HCSR04_Trigger(uint32_t pin) {
 }
 
 void changeEchoPin(uint32_t pin, uint8_t pinSource) {
-	RCC_AHB1PeriphClockCmd(HCSR04_ECHO_CLK, DISABLE);
+	RCC_AHB1PeriphClockCmd(HCSR04_ECHO_CLK, ENABLE);
 
 	//Configure pins as alternating function (AF)
 	GPIO_InitStructure.GPIO_Pin = pin;
@@ -118,13 +111,15 @@ void changeEchoPin(uint32_t pin, uint8_t pinSource) {
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_Init(HCSR04_ECHO_PORT, &GPIO_InitStructure);
 
-	GPIO_PinAFConfig(HCSR04_ECHO_PORT, pinSource, GPIO_AF_TIM2);
+	//RCC_AHB1PeriphClockCmd(HCSR04_ECHO_CLK, ENABLE);
 
-	RCC_AHB1PeriphClockCmd(HCSR04_ECHO_CLK, ENABLE);
+	GPIO_PinAFConfig(HCSR04_ECHO_PORT, pinSource, GPIO_AF_TIM2);
 }
 
 void changeTriggerPin(uint32_t pin) {
-	RCC_AHB1PeriphClockCmd(HCSR04_TRIGGER_CLK, DISABLE);
+	//RCC_AHB1PeriphClockCmd(HCSR04_TRIGGER_CLK, DISABLE);
+
+	RCC_AHB1PeriphClockCmd(HCSR04_TRIGGER_CLK, ENABLE);
 
 	//Configure as digital output
 	GPIO_InitStructure.GPIO_Pin = pin;
@@ -134,32 +129,34 @@ void changeTriggerPin(uint32_t pin) {
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(HCSR04_TRIGGER_PORT, &GPIO_InitStructure);
 
-	RCC_AHB1PeriphClockCmd(HCSR04_TRIGGER_CLK, ENABLE);
-
 	HCSR04_TRIGGER_PORT->BSRRH = pin;
 }
 
-void P_HCSR04_InitIO(void) {
+void changeTimerChannel(uint16_t channel) {
+	P_HCSR04_InitTIM2(channel);
+}
+
+void P_HCSR04_InitIO(uint32_t triggerPin, uint32_t echoPin, uint8_t echoSource) {
 	/** Trigger PIN **/
 
 	RCC_AHB1PeriphClockCmd(HCSR04_TRIGGER_CLK, ENABLE);
 
 	//Configure as digital output
-	GPIO_InitStructure.GPIO_Pin = HCSR04_TRIGGER_PIN;
+	GPIO_InitStructure.GPIO_Pin = triggerPin;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(HCSR04_TRIGGER_PORT, &GPIO_InitStructure);
 
-	HCSR04_TRIGGER_PORT->BSRRH = HCSR04_TRIGGER_PIN;
+	HCSR04_TRIGGER_PORT->BSRRH = triggerPin;
 
 	/** Echo PIN **/
 
 	RCC_AHB1PeriphClockCmd(HCSR04_ECHO_CLK, ENABLE);
 
 	//Configure pins as alternating function (AF)
-	GPIO_InitStructure.GPIO_Pin = HCSR04_ECHO_PIN;
+	GPIO_InitStructure.GPIO_Pin = echoPin;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
@@ -167,11 +164,10 @@ void P_HCSR04_InitIO(void) {
 	GPIO_Init(HCSR04_ECHO_PORT, &GPIO_InitStructure);
 
 	//Connect alternative-function with the IO-pins);
-	GPIO_PinAFConfig(HCSR04_ECHO_PORT, HCSR04_ECHO_SOURCE, GPIO_AF_TIM2);
+	GPIO_PinAFConfig(HCSR04_ECHO_PORT, echoSource, GPIO_AF_TIM2);
 }
 
 void P_HCSR04_InitTIM(void) {
-	TIM_ICInitTypeDef TIM_ICInitStructure;
 	TIM_TimeBaseInitTypeDef	TIM_TimeBaseStructure;
 
 	//TIM7 for delay, TIM2 for input-capture mode
@@ -188,13 +184,16 @@ void P_HCSR04_InitTIM(void) {
 	TIM_TimeBaseInit(TIM7, &TIM_TimeBaseStructure);
 
 	TIM_ARRPreloadConfig(TIM7, ENABLE);
+}
 
+void P_HCSR04_InitTIM2(uint16_t channel) {
+	TIM_ICInitTypeDef TIM_ICInitStructure;
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 
 	//Configure the prescaler
 	TIM_PrescalerConfig(TIM2, HCSR04_TIM2_PRESCALE, TIM_PSCReloadMode_Immediate);
 
-	TIM_ICInitStructure.TIM_Channel = TIM_Channel_1;
+	TIM_ICInitStructure.TIM_Channel = channel;
 	TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Falling;
 	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
 	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;

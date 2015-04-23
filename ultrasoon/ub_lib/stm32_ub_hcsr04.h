@@ -52,8 +52,13 @@ HCSR04_t HCSR04;
 
 
 void UB_HCSR04_Init(void);
+void P_HCSR04_InitTIM(void);
+void P_HCSR04_InitTIM2(uint16_t channel);
+void P_HCSR04_InitNVIC(void);
+void P_HCSR04_InitIO(uint32_t triggerPin, uint32_t echoPin, uint8_t echoSource);
 float UB_HCSR04_Distance_cm(uint32_t pin);
 void changeEchoPin(uint32_t pin, uint8_t pinSource);
 void changeTriggerPin(uint32_t pin);
+void changeTimerChannel(uint16_t channel);
 
 #endif // __STM32F4_UB_HCSR04_H

@@ -45,27 +45,38 @@ int main(void) {
 
 	SystemInit(); //Initialize quartz settings
 	UB_Led_Init();
+
+	uint32_t pins_e[2] = {
+		GPIO_Pin_0, GPIO_Pin_5
+	};
+
+	uint32_t pins_t[2] = {
+		GPIO_Pin_3, GPIO_Pin_4
+	};
+
+	uint8_t pinsources[2] = {
+		GPIO_PinSource0, GPIO_PinSource5
+	};
+
+	uint16_t channels[2] = {
+			TIM_Channel_1, TIM_Channel_3
+	};
+
+	P_HCSR04_InitIO(pins_t[0], pins_e[0], pinsources[0]);
 	UB_HCSR04_Init();
+	P_HCSR04_InitTIM();
+	P_HCSR04_InitTIM2(channels[0]);
+	P_HCSR04_InitNVIC();
+
 	TM_Delay_Init();
 
 	int i;
 
-	uint32_t pins_e[4] = {
-		GPIO_Pin_0, GPIO_Pin_1
-	};
-
-	uint32_t pins_t[4] = {
-		GPIO_Pin_3, GPIO_Pin_4
-	};
-
-	uint8_t pinsources[4] = {
-		GPIO_PinSource0, GPIO_PinSource1
-	};
-
 	while(1) {
-		for(i = 0; i < 2; i++) {
-			changeEchoPin(pins_e[i], pinsources[i]);
+		for(i = 1; i >= 0; i--) {
+			//changeTimerChannel(channels[i]);
 			changeTriggerPin(pins_t[i]);
+			changeEchoPin(pins_e[i], pinsources[i]);
 
 			//Measure the distance
 			distance = UB_HCSR04_Distance_cm(pins_t[i]);
