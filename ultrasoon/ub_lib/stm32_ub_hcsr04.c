@@ -23,7 +23,7 @@
 void P_HCSR04_InitIO(void);
 void P_HCSR04_InitTIM(void);
 void P_HCSR04_InitNVIC(void);
-void P_HCSR04_Trigger(void);
+void P_HCSR04_Trigger(uint32_t pin);
 
 GPIO_InitTypeDef GPIO_InitStructure;
 
@@ -46,7 +46,7 @@ void UB_HCSR04_Init(void) {
 //	 -1	=	 Measurement failure (probably time-out)
 //--------------------------------------------------------------
 
-float UB_HCSR04_Distance_cm(void) {
+float UB_HCSR04_Distance_cm(uint32_t pin) {
 	float return_val = 0.0;
 	uint32_t ok = 0;
 
@@ -54,7 +54,7 @@ float UB_HCSR04_Distance_cm(void) {
 	TIM_SetCounter(TIM2, 0);
 	TIM_Cmd(TIM2, ENABLE);
 
-	P_HCSR04_Trigger();
+	P_HCSR04_Trigger(pin);
 
 	//Wait until measurement is done or timer 7 gives a time-out
 	ok = 0;
@@ -94,9 +94,9 @@ float UB_HCSR04_Distance_cm(void) {
 }
 
 //Internal function, give a 10us trigger-signal via TIM7
-void P_HCSR04_Trigger(void) {
+void P_HCSR04_Trigger(uint32_t pin) {
 	HCSR04.t7_akt_time = 0;
-	HCSR04_TRIGGER_PORT->BSRRL = HCSR04_TRIGGER_PIN;
+	HCSR04_TRIGGER_PORT->BSRRL = pin;
 
 	TIM_Cmd(TIM7, ENABLE);
 
@@ -104,11 +104,12 @@ void P_HCSR04_Trigger(void) {
 
 	TIM_Cmd(TIM7, DISABLE);
 
-	HCSR04_TRIGGER_PORT->BSRRH = HCSR04_TRIGGER_PIN;
+	HCSR04_TRIGGER_PORT->BSRRH = pin;
 }
 
 void changeEchoPin(uint32_t pin, uint8_t pinSource) {
 	RCC_AHB1PeriphClockCmd(HCSR04_ECHO_CLK, DISABLE);
+
 	//Configure pins as alternating function (AF)
 	GPIO_InitStructure.GPIO_Pin = pin;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
@@ -117,13 +118,14 @@ void changeEchoPin(uint32_t pin, uint8_t pinSource) {
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_Init(HCSR04_ECHO_PORT, &GPIO_InitStructure);
 
-	RCC_AHB1PeriphClockCmd(HCSR04_ECHO_CLK, ENABLE);
-
 	GPIO_PinAFConfig(HCSR04_ECHO_PORT, pinSource, GPIO_AF_TIM2);
+
+	RCC_AHB1PeriphClockCmd(HCSR04_ECHO_CLK, ENABLE);
 }
 
 void changeTriggerPin(uint32_t pin) {
 	RCC_AHB1PeriphClockCmd(HCSR04_TRIGGER_CLK, DISABLE);
+
 	//Configure as digital output
 	GPIO_InitStructure.GPIO_Pin = pin;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
@@ -134,7 +136,7 @@ void changeTriggerPin(uint32_t pin) {
 
 	RCC_AHB1PeriphClockCmd(HCSR04_TRIGGER_CLK, ENABLE);
 
-	HCSR04_TRIGGER_PORT->BSRRH = HCSR04_TRIGGER_PIN;
+	HCSR04_TRIGGER_PORT->BSRRH = pin;
 }
 
 void P_HCSR04_InitIO(void) {
@@ -225,7 +227,7 @@ void P_HCSR04_InitNVIC(void) {
 	NVIC_Init(&NVIC_InitStructure);
 
 	//Update interrupt enable
-	TIM_ITConfig(TIM7,TIM_IT_Update, ENABLE);
+	TIM_ITConfig(TIM7, TIM_IT_Update, ENABLE);
 }
 
 // ISR of TIM2

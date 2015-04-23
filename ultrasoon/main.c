@@ -51,51 +51,42 @@ int main(void) {
 	int i;
 
 	uint32_t pins_e[4] = {
-		GPIO_Pin_0, GPIO_Pin_1, GPIO_Pin_2, GPIO_Pin_3
+		GPIO_Pin_0, GPIO_Pin_1
 	};
 
 	uint32_t pins_t[4] = {
-		GPIO_Pin_3, GPIO_Pin_4, GPIO_Pin_5, GPIO_Pin_6
+		GPIO_Pin_3, GPIO_Pin_4
 	};
 
 	uint8_t pinsources[4] = {
-		GPIO_PinSource0, GPIO_PinSource1, GPIO_PinSource2, GPIO_PinSource3
+		GPIO_PinSource0, GPIO_PinSource1
 	};
 
 	while(1) {
-		for(i = 0; i < 3; i++) {
+		for(i = 0; i < 2; i++) {
 			changeEchoPin(pins_e[i], pinsources[i]);
 			changeTriggerPin(pins_t[i]);
 
 			//Measure the distance
-			distance = UB_HCSR04_Distance_cm();
+			distance = UB_HCSR04_Distance_cm(pins_t[i]);
 
 			if(distance > 0) {
 				//Switch LEDs based on distance
+				UB_Led_Off(LED_GREEN);
+				UB_Led_Off(LED_ORANGE);
 				UB_Led_Off(LED_RED);
-				UB_Led_On(LED_ORANGE);
-
-				if(distance < 10.0)
-					UB_Led_On(LED_GREEN);
-				else
-					UB_Led_Off(LED_GREEN);
-
-				if(distance < 15.0)
-					UB_Led_On(LED_BLUE);
-				else
-					UB_Led_Off(LED_BLUE);
+				UB_Led_On(LED_BLUE);
 			} else {
 				//Outside of the measuring range
-				UB_Led_On(LED_RED);
 				UB_Led_Off(LED_GREEN);
 				UB_Led_Off(LED_BLUE );
 				UB_Led_Off(LED_ORANGE);
+				UB_Led_On(LED_RED);
 			}
+
+			printf("[%d] %d\r\n", i, (int)distance);
+			TM_DelayMicros(300000);
 		}
-
-		printf("%d\r\n", (int)distance);
-
-		TM_DelayMicros(300000);
 	}
 }
 

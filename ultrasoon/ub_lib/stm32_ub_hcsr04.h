@@ -52,7 +52,7 @@ HCSR04_t HCSR04;
 
 
 void UB_HCSR04_Init(void);
-float UB_HCSR04_Distance_cm(void);
+float UB_HCSR04_Distance_cm(uint32_t pin);
 void changeEchoPin(uint32_t pin, uint8_t pinSource);
 void changeTriggerPin(uint32_t pin);
 
